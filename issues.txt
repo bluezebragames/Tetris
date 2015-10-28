@@ -1,0 +1,11 @@
+# write lots of comments
+# implement 3-bag randomizer
+# fix rotation at top and on sides
+# wall-kick
+# fix "rotation moving up one" bug
+# show next piece
+# fix "line clear broken z" bug
+# lock delay
+# hard drop
+# gravity
+# piece outlining

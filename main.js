@@ -1,12 +1,13 @@
 // declare variables up here because jslint doesn't like me
-var loop, counter = 0, canvas, context, now, array, x, y, piece, topleftx, toplefty, rotposn, rotArray, keys = [];
+var loop, counter = 0, canvas, context, now, array, x, y, piece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11];
 
 // start everything up!
 var main = function () {
     "use strict";
     canvas = document.getElementById("canvas");
     context = canvas.getContext("2d");
-    array = [[0, 0, 0, 8, 8, 8, 8, 0, 0, 0],
+    // holds the position of the grid
+    array = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -26,6 +27,7 @@ var main = function () {
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
+    // the array that you look at to see what the position of the piece is after it gets rotated
     rotArray = [[[0, 0, 0, 0],
                  [1, 1, 1, 1],
                  [0, 0, 0, 0],
@@ -172,11 +174,12 @@ var main = function () {
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]]];
     
+    // just some starting variables
     topleftx = 3;
     toplefty = -1;
     rotposn = 0;
-    piece = 8;
     
+    newPiece();
     
     loop();
 };
@@ -207,6 +210,7 @@ var drawBlocks = function () {
     for (x = 0; x < 10; x += 1) {
         for (y = 0; y < 20; y += 1) {
             // there are three possibilities: draw nothing, draw it and it is the piece we're moving, and draw it and it's fixed
+            // woo sloppy code
             if (array[y][x] > 7) {
                 context.drawImage(document.getElementById("blocks"), 32 * (array[y][x] - 6), 0, 32, 32, 32 * x, 32 * y, 32, 32);
             } else if (array[y][x] !== 0) {
@@ -230,6 +234,7 @@ var draw = function () {
 // MOVE
 ///////
 
+// umm... moves the piece down?
 var moveDown = function () {
     "use strict";
     for (y = 19; y >= 0; y -= 1) {
@@ -246,7 +251,7 @@ var moveDown = function () {
     toplefty += 1;
 };
 
-
+// umm... moves the piece left?
 var moveLeft = function () {
     "use strict";
     for (x = 0; x < 10; x += 1) {
@@ -263,7 +268,7 @@ var moveLeft = function () {
     topleftx -= 1;
 };
 
-
+// umm... moves the piece right?
 var moveRight = function () {
     "use strict";
     for (x = 9; x >= 0; x -= 1) {
@@ -284,6 +289,7 @@ var moveRight = function () {
 //ROTATE
 ////////
 
+// determines whether or not rotating the piece is legal
 var canRotate = function () {
     "use strict";
     for (x = topleftx; x < topleftx + 4; x += 1) {
@@ -298,6 +304,7 @@ var canRotate = function () {
     return true;
 };
 
+// if legal, rotate the piece
 var rotate = function (dir) {
     "use strict";
     
@@ -305,7 +312,8 @@ var rotate = function (dir) {
         return;
     }
     
-    rotposn = (rotposn + 1) % 4;
+    // yeah this mod code though
+    rotposn = (rotposn + dir + 4) % 4;
     
     // clear out old piece
     for (x = topleftx; x < topleftx + 4; x += 1) {
@@ -330,6 +338,7 @@ var rotate = function (dir) {
 //CLEARING LINES
 ////////////////
 
+// if a line is complete, clear it and move the above pieces down
 var clearLines = function () {
     "use strict";
     var clear, numlines = 0;
@@ -360,6 +369,7 @@ var clearLines = function () {
 //LOCK
 //////
 
+// take the old piece and subtract 7 from it, preventing it from moving
 var lock = function () {
     "use strict";
     for (x = 0; x < 10; x += 1) {
@@ -375,11 +385,26 @@ var lock = function () {
 //NEW PIECE
 ///////////
 
+// randomly generate new type of piece
+var randomPiece = function () {
+    "use strict";
+    var counter = 0;
+    do {
+        piece = Math.floor(7 * Math.random()) + 8;
+        counter += 1;
+    } while (piece === pieces[0] || piece === pieces[1] || piece === pieces[2] || piece === pieces[3] || counter < 4);
+    pieces[0] = pieces[1];
+    pieces[1] = pieces[2];
+    pieces[2] = pieces[3];
+    pieces[3] = piece;
+};
+
+// lock old piece, generate new piece
 var newPiece = function () {
     "use strict";
     lock();
+    randomPiece();
     
-    piece = Math.floor(7 * Math.random()) + 8;
     rotposn = 0;
     
     switch (piece) {//iloztjs
@@ -490,7 +515,7 @@ var handleKeys = function () {
         keys[90] = false;
     }
     if (keys[88]) {
-        rotate(-1);
+        rotate(1);
         keys[88] = false;
     }
 };

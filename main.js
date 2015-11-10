@@ -1,5 +1,5 @@
 // declare variables up here because jslint doesn't like me
-var loop, counter = 0, canvas, context, now, array, x, y, piece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11];
+var loop, counter = 0, canvas, context, now, array, x, y, piece, nextpiece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11];
 
 // start everything up!
 var main = function () {
@@ -179,7 +179,8 @@ var main = function () {
     toplefty = -1;
     rotposn = 0;
     
-    newPiece();
+    newPiece(1);
+    newPiece(0);
     
     loop();
 };
@@ -202,6 +203,7 @@ var main = function () {
 var drawBackground = function () {
     "use strict";
     context.drawImage(document.getElementById("background"), 0, 0);
+    document.getElementById("nextpiece").getContext("2d").drawImage(document.getElementById("nextPiece"), 0, 0);
 };
 
 // draw the squares on the screen
@@ -220,11 +222,25 @@ var drawBlocks = function () {
     }
 };
 
+// draws the next piece in the next box
+// DON'T LOOK AT THIS CODE IF YOU DON'T WANT TO THROW UP
+var drawNext = function () {
+    "use strict";
+    for (x = 0; x < 4; x += 1) {
+        for (y = 0; y < 4; y += 1) {
+            if (rotArray[4 * (nextpiece - 8)][y][x] === 1) {
+                document.getElementById("nextpiece").getContext("2d").drawImage(document.getElementById("blocks"), 32 * (nextpiece - 6), 0, 32, 32, 32 * (x + 3), 32 * (y + 1 - (nextpiece === 12)), 32, 32);
+            }
+        }
+    }
+};
+
 
 // a wrapper function that calls the other draw functions
 var draw = function () {
     "use strict";
     drawBackground();
+    drawNext();
     drawBlocks();
 };
 
@@ -285,14 +301,22 @@ var moveRight = function () {
     topleftx += 1;
 };
 
+// um... moves the piece drop?
+// jk it hard drops the piece
+var moveDrop = function () {
+    "use strict";
+    while (!doesLock()) {
+        moveDown();
+    }
+};
+
 ////////
 //ROTATE
 ////////
 
 // determines whether or not rotating the piece is legal
-var canRotate = function () {
-    "use strict";
-    for (x = topleftx; x < topleftx + 4; x += 1) {
+var canRotateHelper = function (leftAdjust) {
+    for (x = topleftx + leftAdjust; x < topleftx + 4 + leftAdjust; x += 1) {
         for (y = toplefty; y < toplefty + 4; y += 1) {
             if (array[y][x] !== 0 && array[y][x] < 8) {
                 if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty][x - topleftx]) {
@@ -304,11 +328,24 @@ var canRotate = function () {
     return true;
 };
 
+// is a wrapper; checks to see if rotation, rotation one to the left, and rotation one to the right is possible
+// which means it checks for wallkicks too, and reports this to rotate()
+var canRotate = function () {
+    "use strict";
+    if (canRotateHelper(-1)) return -1;
+    else if (canRotateHelper(0)) return 0;
+    else if (canRotateHelper(1)) return 1;
+    // don't ask why 5
+    return 5;
+};
+
 // if legal, rotate the piece
 var rotate = function (dir) {
     "use strict";
     
-    if (!canRotate()) {
+    var ret = canRotate()
+    // don't ask why 5
+    if (ret === 5) {
         return;
     }
     
@@ -325,7 +362,7 @@ var rotate = function (dir) {
     }
     
     // add new piece
-    for (x = topleftx; x < topleftx + 4; x += 1) {
+    for (x = topleftx + ret; x < topleftx + 4 + ret; x += 1) {
         for (y = toplefty; y < toplefty + 4; y += 1) {
             if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty][x - topleftx]) {
                 array[y][x] = piece;
@@ -386,93 +423,96 @@ var lock = function () {
 ///////////
 
 // randomly generate new type of piece
-var randomPiece = function () {
+var randomPiece = function (first) {
     "use strict";
     var counter = 0;
     do {
-        piece = Math.floor(7 * Math.random()) + 8;
+        nextpiece = Math.floor(7 * Math.random()) + 8;
         counter += 1;
-    } while (piece === pieces[0] || piece === pieces[1] || piece === pieces[2] || piece === pieces[3] || counter < 4);
+    } while ((nextpiece === pieces[0] || nextpiece === pieces[1] || nextpiece === pieces[2] || nextpiece === pieces[3] || counter < 4) || (first && (nextpiece === 10 || nextpiece === 11 || nextpiece === 14)));
     pieces[0] = pieces[1];
     pieces[1] = pieces[2];
     pieces[2] = pieces[3];
-    pieces[3] = piece;
+    pieces[3] = nextpiece;
+    piece = pieces[2];
 };
 
 // lock old piece, generate new piece
-var newPiece = function () {
+var newPiece = function (first) {
     "use strict";
     lock();
-    randomPiece();
+    randomPiece(first);
     
     rotposn = 0;
-    
-    switch (piece) {//iloztjs
-    case 8:
-        array[0][3] = piece;
-        array[0][4] = piece;
-        array[0][5] = piece;
-        array[0][6] = piece;
-        topleftx = 3;
-        toplefty = -1;
-        break;
-    case 9:
-        array[0][3] = piece;
-        array[0][4] = piece;
-        array[0][5] = piece;
-        array[1][3] = piece;
-        topleftx = 3;
-        toplefty = -1;
-        break;
-    case 10:
-        array[0][4] = piece;
-        array[0][5] = piece;
-        array[1][4] = piece;
-        array[1][5] = piece;
-        topleftx = 3;
-        toplefty = -1;
-        break;
-    case 11:
-        array[0][3] = piece;
-        array[0][4] = piece;
-        array[1][4] = piece;
-        array[1][5] = piece;
-        topleftx = 3;
-        toplefty = -1;
-        break;
-    case 12:
-        array[0][3] = piece;
-        array[0][4] = piece;
-        array[0][5] = piece;
-        array[1][4] = piece;
-        topleftx = 3;
-        toplefty = -1;
-        break;
-    case 13:
-        array[0][3] = piece;
-        array[0][4] = piece;
-        array[0][5] = piece;
-        array[1][5] = piece;
-        topleftx = 3;
-        toplefty = -1;
-        break;
-    case 14:
-        array[0][4] = piece;
-        array[0][5] = piece;
-        array[1][3] = piece;
-        array[1][4] = piece;
-        topleftx = 3;
-        toplefty = -1;
-        break;
+    if (!first) {
+        switch (piece) {
+        case 8:
+            array[0][3] = piece;
+            array[0][4] = piece;
+            array[0][5] = piece;
+            array[0][6] = piece;
+            topleftx = 3;
+            toplefty = -1;
+            break;
+        case 9:
+            array[0][3] = piece;
+            array[0][4] = piece;
+            array[0][5] = piece;
+            array[1][3] = piece;
+            topleftx = 3;
+            toplefty = -1;
+            break;
+        case 10:
+            array[0][4] = piece;
+            array[0][5] = piece;
+            array[1][4] = piece;
+            array[1][5] = piece;
+            topleftx = 3;
+            toplefty = -1;
+            break;
+        case 11:
+            array[0][3] = piece;
+            array[0][4] = piece;
+            array[1][4] = piece;
+            array[1][5] = piece;
+            topleftx = 3;
+            toplefty = -1;
+            break;
+        case 12:
+            array[0][3] = piece;
+            array[0][4] = piece;
+            array[0][5] = piece;
+            array[1][4] = piece;
+            topleftx = 3;
+            toplefty = -1;
+            break;
+        case 13:
+            array[0][3] = piece;
+            array[0][4] = piece;
+            array[0][5] = piece;
+            array[1][5] = piece;
+            topleftx = 3;
+            toplefty = -1;
+            break;
+        case 14:
+            array[0][4] = piece;
+            array[0][5] = piece;
+            array[1][3] = piece;
+            array[1][4] = piece;
+            topleftx = 3;
+            toplefty = -1;
+            break;
+        }
     }
 };
 
+// determines whether the current piece is at the bottom, and if it is, generates a new piece
 var doesLock = function () {
     "use strict";
     for (x = 0; x < 10; x += 1) {
         for (y = 0; y < 20; y += 1) {
             if (array[y][x] > 7 && (y === 19 || (array[y + 1][x] > 0 && array[y + 1][x] <= 7))) {
-                newPiece();
+                return true;
             }
         }
     }
@@ -482,6 +522,7 @@ var doesLock = function () {
 //DEBUG
 ///////
 
+// a function to print out whatever is wanted.  called by pressing q
 var debugPrint = function () {
     "use strict";
     alert(toplefty);
@@ -491,6 +532,7 @@ var debugPrint = function () {
 //KEY HANDLER
 /////////////
 
+// checks all of the values in keys[] to see which key is pressed, and calls the function corresponding to the key.
 var handleKeys = function () {
     "use strict";
         
@@ -501,6 +543,10 @@ var handleKeys = function () {
     if (keys[37]) {
         moveLeft();
         keys[37] = false;
+    }
+    if (keys[38]) {
+        moveDrop();
+        keys[38] = false;
     }
     if (keys[39]) {
         moveRight();
@@ -522,12 +568,12 @@ var handleKeys = function () {
 
 
 
-
+// the main game loop -- draws, checks to lock, clears lines, handles keys
 var loop = function () {
     "use strict";
     
     draw();
-    doesLock();
+    if (doesLock()) {newPiece(0); }
     clearLines();
     handleKeys();
     
@@ -538,7 +584,7 @@ var loop = function () {
 };
 
 
-
+// called when key is pressed -- changes keys[] to reflect keypress
 function getChar(event) {
     "use strict";
     keys[event.keyCode] = event.type === 'keydown';

@@ -1,5 +1,5 @@
 // declare variables up here because jslint doesn't like me
-var loop, counter = 0, canvas, context, now, array, x, y, piece, nextpiece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11];
+var loop, counter = 0, canvas, context, now, array, x, y, piece, nextpiece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11], timers = [];
 
 // start everything up!
 var main = function () {
@@ -32,156 +32,156 @@ var main = function () {
                  [1, 1, 1, 1],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 0, 1, 0],
                  [0, 0, 1, 0],
                  [0, 0, 1, 0],
                  [0, 0, 1, 0]],
-               
+
                 [[0, 0, 0, 0],
                  [1, 1, 1, 1],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 0, 1, 0],
                  [0, 0, 1, 0],
                  [0, 0, 1, 0],
                  [0, 0, 1, 0]],
-               
-               
+
+
                 [[1, 1, 1, 0],
                  [1, 0, 0, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[1, 1, 0, 0],
                  [0, 1, 0, 0],
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 0, 0, 0],
                  [0, 0, 1, 0],
                  [1, 1, 1, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 1, 0, 0],
                  [0, 1, 0, 0],
                  [0, 1, 1, 0],
                  [0, 0, 0, 0]],
-                
-                
+
+
                 [[0, 1, 1, 0],
                  [0, 1, 1, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 1, 1, 0],
                  [0, 1, 1, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 1, 1, 0],
                  [0, 1, 1, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 1, 1, 0],
                  [0, 1, 1, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-                
-               
+
+
                 [[1, 1, 0, 0],
                  [0, 1, 1, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 0, 1, 0],
                  [0, 1, 1, 0],
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[1, 1, 0, 0],
                  [0, 1, 1, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 0, 1, 0],
                  [0, 1, 1, 0],
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]],
-                
-                
+
+
                 [[0, 0, 0, 0],
                  [1, 1, 1, 0],
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 1, 0, 0],
                  [1, 1, 0, 0],
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 0, 0, 0],
                  [0, 1, 0, 0],
                  [1, 1, 1, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 1, 0, 0],
                  [0, 1, 1, 0],
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]],
-                           
-               
+
+
                 [[1, 1, 1, 0],
                  [0, 0, 1, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 1, 0, 0],
                  [0, 1, 0, 0],
                  [1, 1, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 0, 0, 0],
                  [1, 0, 0, 0],
                  [1, 1, 1, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 1, 1, 0],
                  [0, 1, 0, 0],
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]],
-                
-               
+
+
                 [[0, 1, 1, 0],
                  [1, 1, 0, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[1, 0, 0, 0],
                  [1, 1, 0, 0],
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[0, 1, 1, 0],
                  [1, 1, 0, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 0]],
-               
+
                 [[1, 0, 0, 0],
                  [1, 1, 0, 0],
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]]];
-    
+
     // just some starting variables
     topleftx = 3;
     toplefty = -1;
     rotposn = 0;
-    
+
     newPiece(1);
     newPiece(0);
-    
+
     loop();
 };
 
@@ -316,10 +316,11 @@ var moveDrop = function () {
 
 // determines whether or not rotating the piece is legal
 var canRotateHelper = function (leftAdjust) {
+    "use strict";
     for (x = topleftx + leftAdjust; x < topleftx + 4 + leftAdjust; x += 1) {
         for (y = toplefty; y < toplefty + 4; y += 1) {
             if (array[y][x] !== 0 && array[y][x] < 8) {
-                if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty][x - topleftx]) {
+                if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty][x - topleftx + leftAdjust]) {
                     return false;
                 }
             }
@@ -332,9 +333,9 @@ var canRotateHelper = function (leftAdjust) {
 // which means it checks for wallkicks too, and reports this to rotate()
 var canRotate = function () {
     "use strict";
-    if (canRotateHelper(-1)) return -1;
-    else if (canRotateHelper(0)) return 0;
+    if (canRotateHelper(0)) return 0;
     else if (canRotateHelper(1)) return 1;
+    else if (canRotateHelper(-1)) return -1;
     // don't ask why 5
     return 5;
 };
@@ -343,15 +344,17 @@ var canRotate = function () {
 var rotate = function (dir) {
     "use strict";
     
-    var ret = canRotate()
-    // don't ask why 5
-    if (ret === 5) {
-        return;
-    }
-    
     // yeah this mod code though
     rotposn = (rotposn + dir + 4) % 4;
     
+    var ret = canRotate()
+    // don't ask why 5
+    if (ret === 5) {
+        // yeah this mod code though
+        rotposn = (rotposn - dir + 4) % 4;
+        return;
+    }
+
     // clear out old piece
     for (x = topleftx; x < topleftx + 4; x += 1) {
         for (y = toplefty; y < toplefty + 4; y += 1) {
@@ -360,11 +363,11 @@ var rotate = function (dir) {
             }
         }
     }
-    
+
     // add new piece
     for (x = topleftx + ret; x < topleftx + 4 + ret; x += 1) {
         for (y = toplefty; y < toplefty + 4; y += 1) {
-            if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty][x - topleftx]) {
+            if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty][x - topleftx - ret]) {
                 array[y][x] = piece;
             }
         }
@@ -442,7 +445,7 @@ var newPiece = function (first) {
     "use strict";
     lock();
     randomPiece(first);
-    
+
     rotposn = 0;
     if (!first) {
         switch (piece) {
@@ -535,7 +538,7 @@ var debugPrint = function () {
 // checks all of the values in keys[] to see which key is pressed, and calls the function corresponding to the key.
 var handleKeys = function () {
     "use strict";
-        
+
     if (keys[81]) {
         debugPrint();
         keys[81] = false;
@@ -571,13 +574,13 @@ var handleKeys = function () {
 // the main game loop -- draws, checks to lock, clears lines, handles keys
 var loop = function () {
     "use strict";
-    
+
     draw();
     if (doesLock()) {newPiece(0); }
     clearLines();
     handleKeys();
-    
-    
+
+
     /*context.fillStyle = "#404040";
     context.fillRect(0, 0, 30, 30);*/
     requestAnimationFrame(loop);

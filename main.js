@@ -1,5 +1,5 @@
 // declare variables up here because jslint doesn't like me
-var loop, counter = 0, canvas, context, now, array, x, y, piece, nextpiece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11], timers = [];
+var loop, counter = 0, canvas, context, now, array, i, x, y, piece, nextpiece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11], timers = [], numTimers = -1;
 
 // start everything up!
 var main = function () {
@@ -311,6 +311,59 @@ var moveDrop = function () {
 };
 
 ////////
+//TIMERS
+////////
+
+// creates a timer with "time" frames on it that calls "func" with arguments "args" when it finishes
+var createTimer = function (time, func, args) {
+    "use strict";
+    for (i = 0; i <= numTimers; i += 1) {
+        if (timers[i][1] === func) {
+            return;
+        }
+    }
+    numTimers += 1;
+    timers[numTimers] = [];
+    timers[numTimers][0] = time;
+    timers[numTimers][1] = func;
+    timers[numTimers][2] = args;
+};
+
+// checks all of the timers to see if any have finished.  If they have, calls the function and deletes the timer from the list.
+var checkTimers = function () {
+    "use strict";
+    for (i = 0; i <= numTimers; i += 1) {
+        if (numTimers <= -1) {
+            return;
+        }
+        if (timers[i][0] === 0) {
+            timers[numTimers][1](timers[numTimers][2][0]);
+            console.log(timers[i]);
+            console.log(numTimers);
+            timers.splice(i,1);
+            i -= 1;
+            numTimers -= 1;
+        }
+    }
+};
+
+// subtracts one from all of the timers in the list.
+var decrementTimers = function () {
+    "use strict";
+    for (i = 0; i <= numTimers; i += 1) {
+        timers[i][0] -= 1;
+    }
+};
+
+// the function that you call each frame.  Is a wrapper function.  Deals with everything timer-related.
+var timerFrame = function () {
+    "use strict";
+    decrementTimers();
+    checkTimers();
+};
+
+
+////////
 //ROTATE
 ////////
 
@@ -333,9 +386,13 @@ var canRotateHelper = function (leftAdjust) {
 // which means it checks for wallkicks too, and reports this to rotate()
 var canRotate = function () {
     "use strict";
-    if (canRotateHelper(0)) return 0;
-    else if (canRotateHelper(1)) return 1;
-    else if (canRotateHelper(-1)) return -1;
+    if (canRotateHelper(0)) {
+        return 0;
+    } else if (canRotateHelper(1)) {
+        return 1;
+    } else if (canRotateHelper(-1)) {
+        return -1;
+    }
     // don't ask why 5
     return 5;
 };
@@ -347,7 +404,7 @@ var rotate = function (dir) {
     // yeah this mod code though
     rotposn = (rotposn + dir + 4) % 4;
     
-    var ret = canRotate()
+    var ret = canRotate();
     // don't ask why 5
     if (ret === 5) {
         // yeah this mod code though
@@ -576,7 +633,8 @@ var loop = function () {
     "use strict";
 
     draw();
-    if (doesLock()) {newPiece(0); }
+    timerFrame();
+    if (doesLock()) {createTimer(10, newPiece, [0]); }
     clearLines();
     handleKeys();
 

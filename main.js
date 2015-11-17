@@ -253,12 +253,12 @@ var draw = function () {
 // umm... moves the piece down?
 var moveDown = function () {
     "use strict";
+    if (doesLock()) {
+        return;
+    }
     for (y = 19; y >= 0; y -= 1) {
         for (x = 0; x < 10; x += 1) {
             if (array[y][x] > 7) {
-                if (y === 19) {
-                    return;
-                }
                 array[y + 1][x] = array[y][x];
                 array[y][x] = 0;
             }
@@ -340,7 +340,7 @@ var checkTimers = function () {
             timers[numTimers][1](timers[numTimers][2][0]);
             console.log(timers[i]);
             console.log(numTimers);
-            timers.splice(i,1);
+            timers.splice(i, 1);
             i -= 1;
             numTimers -= 1;
         }

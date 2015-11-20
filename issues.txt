@@ -1,13 +1,13 @@
 # write lots of comments
-# fix rotation at top and on sides
-# wall-kick
-# fix "rotation moving up one" bug
-# show next piece
-# fix "line clear broken z/s" bug
-# lock delay
-# hard drop
+# fix rotation at top
+# fix "line clear broken z/s" bug  FINALLY DONE
+# fix "locking in midair" bug      v
+# fix "move left before lock" bug  ^
+# clean up newPiece and whatever that other thing was
+# instalock when down pressed
 # gravity
 # piece outlining
+# lock animation
 # grades
 # score
 # levels

@@ -49,9 +49,9 @@ var main = function () {
                  [0, 0, 1, 0]],
 
 
-                [[1, 1, 1, 0],
+                [[0, 0, 0, 0],
+                 [1, 1, 1, 0],
                  [1, 0, 0, 0],
-                 [0, 0, 0, 0],
                  [0, 0, 0, 0]],
 
                 [[1, 1, 0, 0],
@@ -70,30 +70,30 @@ var main = function () {
                  [0, 0, 0, 0]],
 
 
-                [[0, 1, 1, 0],
+                [[0, 0, 0, 0],
                  [0, 1, 1, 0],
-                 [0, 0, 0, 0],
+                 [0, 1, 1, 0],
                  [0, 0, 0, 0]],
 
-                [[0, 1, 1, 0],
+                [[0, 0, 0, 0],
                  [0, 1, 1, 0],
-                 [0, 0, 0, 0],
+                 [0, 1, 1, 0],
                  [0, 0, 0, 0]],
 
-                [[0, 1, 1, 0],
+                [[0, 0, 0, 0],
                  [0, 1, 1, 0],
-                 [0, 0, 0, 0],
+                 [0, 1, 1, 0],
                  [0, 0, 0, 0]],
 
-                [[0, 1, 1, 0],
+                [[0, 0, 0, 0],
                  [0, 1, 1, 0],
-                 [0, 0, 0, 0],
+                 [0, 1, 1, 0],
                  [0, 0, 0, 0]],
 
 
-                [[1, 1, 0, 0],
+                [[0, 0, 0, 0],
+                 [1, 1, 0, 0],
                  [0, 1, 1, 0],
-                 [0, 0, 0, 0],
                  [0, 0, 0, 0]],
 
                 [[0, 0, 1, 0],
@@ -101,9 +101,9 @@ var main = function () {
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]],
 
-                [[1, 1, 0, 0],
+                [[0, 0, 0, 0],
+                 [1, 1, 0, 0],
                  [0, 1, 1, 0],
-                 [0, 0, 0, 0],
                  [0, 0, 0, 0]],
 
                 [[0, 0, 1, 0],
@@ -133,9 +133,9 @@ var main = function () {
                  [0, 0, 0, 0]],
 
 
-                [[1, 1, 1, 0],
+                [[0, 0, 0, 0],
+                 [1, 1, 1, 0],
                  [0, 0, 1, 0],
-                 [0, 0, 0, 0],
                  [0, 0, 0, 0]],
 
                 [[0, 1, 0, 0],
@@ -154,9 +154,9 @@ var main = function () {
                  [0, 0, 0, 0]],
 
 
-                [[0, 1, 1, 0],
+                [[0, 0, 0, 0],
+                 [0, 1, 1, 0],
                  [1, 1, 0, 0],
-                 [0, 0, 0, 0],
                  [0, 0, 0, 0]],
 
                 [[1, 0, 0, 0],
@@ -164,9 +164,9 @@ var main = function () {
                  [0, 1, 0, 0],
                  [0, 0, 0, 0]],
 
-                [[0, 1, 1, 0],
+                [[0, 0, 0, 0],
+                 [0, 1, 1, 0],
                  [1, 1, 0, 0],
-                 [0, 0, 0, 0],
                  [0, 0, 0, 0]],
 
                 [[1, 0, 0, 0],
@@ -223,13 +223,13 @@ var drawBlocks = function () {
 };
 
 // draws the next piece in the next box
-// DON'T LOOK AT THIS CODE IF YOU DON'T WANT TO THROW UP
+// DON'T LOOK AT THIS CODE UNLESS YOU WANT TO THROW UP
 var drawNext = function () {
     "use strict";
     for (x = 0; x < 4; x += 1) {
         for (y = 0; y < 4; y += 1) {
             if (rotArray[4 * (nextpiece - 8)][y][x] === 1) {
-                document.getElementById("nextpiece").getContext("2d").drawImage(document.getElementById("blocks"), 32 * (nextpiece - 6), 0, 32, 32, 32 * (x + 3), 32 * (y + 1 - (nextpiece === 12)), 32, 32);
+                document.getElementById("nextpiece").getContext("2d").drawImage(document.getElementById("blocks"), 32 * (nextpiece - 6), 0, 32, 32, 32 * (x + 3), 32 * (y + (nextpiece === 8)), 32, 32);
             }
         }
     }
@@ -270,12 +270,20 @@ var moveDown = function () {
 // umm... moves the piece left?
 var moveLeft = function () {
     "use strict";
+
     for (x = 0; x < 10; x += 1) {
         for (y = 0; y < 20; y += 1) {
             if (array[y][x] > 7) {
-                if (x === 0) {
+                if (x === 0 || (array[y][x - 1] > 0 && array[y][x - 1] < 8)) {
                     return;
                 }
+            }
+        }
+    }
+
+    for (x = 0; x < 10; x += 1) {
+        for (y = 0; y < 20; y += 1) {
+            if (array[y][x] > 7) {
                 array[y][x - 1] = array[y][x];
                 array[y][x] = 0;
             }
@@ -287,12 +295,20 @@ var moveLeft = function () {
 // umm... moves the piece right?
 var moveRight = function () {
     "use strict";
+
     for (x = 9; x >= 0; x -= 1) {
         for (y = 0; y < 20; y += 1) {
             if (array[y][x] > 7) {
-                if (x === 9) {
+                if (x === 9 || (array[y][x + 1] > 0 && array[y][x + 1] < 8)) {
                     return;
                 }
+            }
+        }
+    }
+
+    for (x = 9; x >= 0; x -= 1) {
+        for (y = 0; y < 20; y += 1) {
+            if (array[y][x] > 7) {
                 array[y][x + 1] = array[y][x];
                 array[y][x] = 0;
             }
@@ -338,14 +354,27 @@ var checkTimers = function () {
         }
         if (timers[i][0] === 0) {
             timers[numTimers][1](timers[numTimers][2][0]);
-            console.log(timers[i]);
-            console.log(numTimers);
             timers.splice(i, 1);
             i -= 1;
             numTimers -= 1;
         }
     }
 };
+
+// removes the timer with name "name"
+var removeTimer = function (name) {
+    for (i = 0; i <= numTimers; i += 1) {
+        if (numTimers <= -1) {
+            return;
+        }
+        if (timers[i][0] === 0) {
+            timers.splice(i, 1);
+            i -= 1;
+            numTimers -= 1;
+            return;
+        }
+    }
+}
 
 // subtracts one from all of the timers in the list.
 var decrementTimers = function () {
@@ -372,8 +401,12 @@ var canRotateHelper = function (leftAdjust) {
     "use strict";
     for (x = topleftx + leftAdjust; x < topleftx + 4 + leftAdjust; x += 1) {
         for (y = toplefty; y < toplefty + 4; y += 1) {
-            if (array[y][x] !== 0 && array[y][x] < 8) {
-                if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty][x - topleftx + leftAdjust]) {
+            // those pluses and minuses though
+            if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty][x - topleftx - leftAdjust]) {
+                if (array[y][x] !== 0 && array[y][x] < 8) {
+                    return false;
+                }
+                if (array[y][x] === undefined) {
                     return false;
                 }
             }
@@ -388,9 +421,11 @@ var canRotate = function () {
     "use strict";
     if (canRotateHelper(0)) {
         return 0;
-    } else if (canRotateHelper(1)) {
+    }
+    if (canRotateHelper(1)) {
         return 1;
-    } else if (canRotateHelper(-1)) {
+    }
+    if (canRotateHelper(-1)) {
         return -1;
     }
     // don't ask why 5
@@ -400,10 +435,10 @@ var canRotate = function () {
 // if legal, rotate the piece
 var rotate = function (dir) {
     "use strict";
-    
+
     // yeah this mod code though
     rotposn = (rotposn + dir + 4) % 4;
-    
+
     var ret = canRotate();
     // don't ask why 5
     if (ret === 5) {
@@ -429,6 +464,9 @@ var rotate = function (dir) {
             }
         }
     }
+
+    // change topleftx to reflect adjustment "ret"
+    topleftx += ret;
 };
 
 ////////////////
@@ -439,6 +477,19 @@ var rotate = function (dir) {
 var clearLines = function () {
     "use strict";
     var clear, numlines = 0;
+
+    var temp = false;
+    for (y = 19; y >= 0; y -= 1) {
+        clear = true;
+        for (x = 0; x < 10; x += 1) {
+            if (array[y][x] === 0 || array[y][x] > 7) {
+                clear = false;
+            }
+        }
+        if(clear){temp = true;}
+    }
+
+
     for (y = 19; y >= 0; y -= 1) {
         clear = true;
         for (x = 0; x < 10; x += 1) {
@@ -449,11 +500,13 @@ var clearLines = function () {
         if (clear) {
             numlines += 1;
             for (x = 0; x < 10; x += 1) {
-                array[y][x] = 0;
+                if (array[y][x] < 8) {
+                    array[y][x] = 0;
+                }
             }
         } else {
             for (x = 0; x < 10; x += 1) {
-                if (array[y][x] < 8) {
+                if (array[y][x] < 8 && array[y + numlines][x] < 8) {
                     array[y + numlines][x] = array[y][x];
                 }
             }
@@ -511,59 +564,49 @@ var newPiece = function (first) {
             array[0][4] = piece;
             array[0][5] = piece;
             array[0][6] = piece;
-            topleftx = 3;
-            toplefty = -1;
             break;
         case 9:
             array[0][3] = piece;
             array[0][4] = piece;
             array[0][5] = piece;
             array[1][3] = piece;
-            topleftx = 3;
-            toplefty = -1;
             break;
         case 10:
             array[0][4] = piece;
             array[0][5] = piece;
             array[1][4] = piece;
             array[1][5] = piece;
-            topleftx = 3;
-            toplefty = -1;
             break;
         case 11:
             array[0][3] = piece;
             array[0][4] = piece;
             array[1][4] = piece;
             array[1][5] = piece;
-            topleftx = 3;
-            toplefty = -1;
             break;
         case 12:
             array[0][3] = piece;
             array[0][4] = piece;
             array[0][5] = piece;
             array[1][4] = piece;
-            topleftx = 3;
-            toplefty = -1;
             break;
         case 13:
             array[0][3] = piece;
             array[0][4] = piece;
             array[0][5] = piece;
             array[1][5] = piece;
-            topleftx = 3;
-            toplefty = -1;
             break;
         case 14:
             array[0][4] = piece;
             array[0][5] = piece;
             array[1][3] = piece;
             array[1][4] = piece;
-            topleftx = 3;
-            toplefty = -1;
             break;
         }
     }
+    //if(piece === 11){document.getElementById('temp2').innerHTML = array;}
+    //if(piece === 14){document.getElementById('temp2').innerHTML = array;}
+    topleftx = 3;
+    toplefty = -1;
 };
 
 // determines whether the current piece is at the bottom, and if it is, generates a new piece
@@ -634,7 +677,8 @@ var loop = function () {
 
     draw();
     timerFrame();
-    if (doesLock()) {createTimer(10, newPiece, [0]); }
+    if (doesLock()) {createTimer(30, newPiece, [0]); }
+    if (!doesLock()) {removeTimer(newPiece); }
     clearLines();
     handleKeys();
 

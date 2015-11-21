@@ -367,7 +367,7 @@ var removeTimer = function (name) {
         if (numTimers <= -1) {
             return;
         }
-        if (timers[i][0] === 0) {
+        if (timers[i][1] === name) {
             timers.splice(i, 1);
             i -= 1;
             numTimers -= 1;
@@ -619,6 +619,7 @@ var doesLock = function () {
             }
         }
     }
+    return false;
 };
 
 ///////
@@ -628,7 +629,7 @@ var doesLock = function () {
 // a function to print out whatever is wanted.  called by pressing q
 var debugPrint = function () {
     "use strict";
-    alert(toplefty);
+    removeTimer(newPiece);
 };
 
 /////////////

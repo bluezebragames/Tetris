@@ -478,18 +478,6 @@ var clearLines = function () {
     "use strict";
     var clear, numlines = 0;
 
-    var temp = false;
-    for (y = 19; y >= 0; y -= 1) {
-        clear = true;
-        for (x = 0; x < 10; x += 1) {
-            if (array[y][x] === 0 || array[y][x] > 7) {
-                clear = false;
-            }
-        }
-        if(clear){temp = true;}
-    }
-
-
     for (y = 19; y >= 0; y -= 1) {
         clear = true;
         for (x = 0; x < 10; x += 1) {
@@ -558,53 +546,13 @@ var newPiece = function (first) {
 
     rotposn = 0;
     if (!first) {
-        switch (piece) {
-        case 8:
-            array[0][3] = piece;
-            array[0][4] = piece;
-            array[0][5] = piece;
-            array[0][6] = piece;
-            break;
-        case 9:
-            array[0][3] = piece;
-            array[0][4] = piece;
-            array[0][5] = piece;
-            array[1][3] = piece;
-            break;
-        case 10:
-            array[0][4] = piece;
-            array[0][5] = piece;
-            array[1][4] = piece;
-            array[1][5] = piece;
-            break;
-        case 11:
-            array[0][3] = piece;
-            array[0][4] = piece;
-            array[1][4] = piece;
-            array[1][5] = piece;
-            break;
-        case 12:
-            array[0][3] = piece;
-            array[0][4] = piece;
-            array[0][5] = piece;
-            array[1][4] = piece;
-            break;
-        case 13:
-            array[0][3] = piece;
-            array[0][4] = piece;
-            array[0][5] = piece;
-            array[1][5] = piece;
-            break;
-        case 14:
-            array[0][4] = piece;
-            array[0][5] = piece;
-            array[1][3] = piece;
-            array[1][4] = piece;
-            break;
+        // LOOKS SO MUCH BETTER NOW
+        for (y = 0; y < 3; y += 1) {
+            for (x = 3; x < 7; x += 1) {
+                array[y][x] = piece * rotArray[4 * (piece - 8)][y + 1][x - 3];
+            }
         }
     }
-    //if(piece === 11){document.getElementById('temp2').innerHTML = array;}
-    //if(piece === 14){document.getElementById('temp2').innerHTML = array;}
     topleftx = 3;
     toplefty = -1;
 };

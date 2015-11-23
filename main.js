@@ -1,5 +1,5 @@
 // declare variables up here because jslint doesn't like me
-var loop, counter = 0, canvas, context, now, array, i, x, y, piece, nextpiece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11], timers = [], numTimers = -1;
+var loop, counter = 0, canvas, context, now, array, i, x, y, piece, nextpiece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11], timers = [], numTimers = -1, looping = true;
 
 // start everything up!
 var main = function () {
@@ -326,6 +326,13 @@ var moveDrop = function () {
     }
 };
 
+/////////
+//GRAVITY
+/////////
+var doGravity = function () {
+    createTimer(59, moveDown, []);
+}
+
 ////////
 //TIMERS
 ////////
@@ -519,6 +526,21 @@ var lock = function () {
     }
 };
 
+var checkLocks = function () {
+    "use strict";
+    if (doesLock()) {
+        if(keys[40]) {
+            newPiece(0);
+        }
+        else {
+            createTimer(30, newPiece, [0]);
+        }
+    }
+    if (!doesLock()) {
+        removeTimer(newPiece);
+    }
+};
+
 ///////////
 //NEW PIECE
 ///////////
@@ -616,6 +638,9 @@ var handleKeys = function () {
         rotate(1);
         keys[88] = false;
     }
+    if (keys[20]) {
+        looping = false;
+    }
 };
 
 
@@ -626,15 +651,17 @@ var loop = function () {
 
     draw();
     timerFrame();
-    if (doesLock()) {createTimer(30, newPiece, [0]); }
-    if (!doesLock()) {removeTimer(newPiece); }
+    checkLocks();
+    doGravity();
     clearLines();
     handleKeys();
 
 
     /*context.fillStyle = "#404040";
     context.fillRect(0, 0, 30, 30);*/
-    requestAnimationFrame(loop);
+    if(looping) {
+        requestAnimationFrame(loop);
+    }
 };
 
 
@@ -642,6 +669,12 @@ var loop = function () {
 function getChar(event) {
     "use strict";
     keys[event.keyCode] = event.type === 'keydown';
+    // CAPS LOCK key is specially here because it pauses the game
+    // so it can't be in handleKeys because loop calls it
+    if (!looping && !keys[20]) {
+        looping = true;
+        loop();
+    }
 }
 
 window.onload = function () {

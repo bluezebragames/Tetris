@@ -1,9 +1,7 @@
-# write lots of comments
 # fix rotation at top
 # fix "line clear broken z/s" bug  FINALLY DONE
-# clean up newPiece and whatever that other thing was
-# instalock when down pressed
-# gravity
+# make gravity correct?
+# fix "Game over actually just clears things below it" bug (prob in nextPiece or something)
 # piece outlining
 # lock animation
 # grades

@@ -1,9 +1,9 @@
-# fix rotation at top
-# fix "line clear broken z/s" bug  FINALLY DONE
+# fix rotation at top (workaround: push down on rotate if at top)
 # make gravity correct?
-# fix "Game over actually just clears things below it" bug (prob in nextPiece or something)
 # piece outlining
 # lock animation
 # grades
 # score
 # levels
+# pause on loss of focus
+# fix "pause, switch window, unpause" not working bug

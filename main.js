@@ -1,5 +1,5 @@
 // declare variables up here because jslint doesn't like me
-var loop, counter = 0, canvas, context, now, array, i, x, y, piece, nextpiece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11], timers = [], numTimers = -1, looping = true;
+var loop, counter = 0, canvas, context, now, array, i, x, y, piece, nextpiece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11], timers = [], numTimers = -1, looping = true, downOne, currLevel = 0;
 
 // start everything up!
 var main = function () {
@@ -324,6 +324,8 @@ var moveDrop = function () {
     while (!doesLock()) {
         moveDown();
     }
+    // hard drop resets the gravity timer
+    removeTimer(moveDown);
 };
 
 /////////
@@ -406,18 +408,33 @@ var timerFrame = function () {
 // determines whether or not rotating the piece is legal
 var canRotateHelper = function (leftAdjust) {
     "use strict";
+    var moved = false;
+    if (toplefty < 0) {
+        toplefty += 1;
+        downOne = true;
+        moved = true;
+    }
     for (x = topleftx + leftAdjust; x < topleftx + 4 + leftAdjust; x += 1) {
         for (y = toplefty; y < toplefty + 4; y += 1) {
             // those pluses and minuses though
             if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty][x - topleftx - leftAdjust]) {
                 if (array[y][x] !== 0 && array[y][x] < 8) {
+                    if (moved) {
+                        toplefty -= 1;
+                    }
                     return false;
                 }
                 if (array[y][x] === undefined) {
+                    if (moved) {
+                        toplefty -= 1;
+                    }
                     return false;
                 }
             }
         }
+    }
+    if (moved) {
+        toplefty -= 1;
     }
     return true;
 };
@@ -446,6 +463,7 @@ var rotate = function (dir) {
     // yeah this mod code though
     rotposn = (rotposn + dir + 4) % 4;
 
+    downOne = false;
     var ret = canRotate();
     // don't ask why 5
     if (ret === 5) {
@@ -457,7 +475,7 @@ var rotate = function (dir) {
     // clear out old piece
     for (x = topleftx; x < topleftx + 4; x += 1) {
         for (y = toplefty; y < toplefty + 4; y += 1) {
-            if (array[y][x] > 7) {
+            if (y >= 0 && array[y][x] > 7) {
                 array[y][x] = 0;
             }
         }
@@ -465,8 +483,8 @@ var rotate = function (dir) {
 
     // add new piece
     for (x = topleftx + ret; x < topleftx + 4 + ret; x += 1) {
-        for (y = toplefty; y < toplefty + 4; y += 1) {
-            if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty][x - topleftx - ret]) {
+        for (y = toplefty + downOne; y < toplefty + 4 + downOne; y += 1) {
+            if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty - downOne][x - topleftx - ret]) {
                 array[y][x] = piece;
             }
         }
@@ -474,6 +492,8 @@ var rotate = function (dir) {
 
     // change topleftx to reflect adjustment "ret"
     topleftx += ret;
+    // change toplefty to reflect adjustment "downOne"
+    toplefty += (downOne === true);
 };
 
 ////////////////
@@ -507,6 +527,8 @@ var clearLines = function () {
             }
         }
     }
+
+    currLevel += numlines;
 };
 
 
@@ -565,18 +587,28 @@ var newPiece = function (first) {
     "use strict";
     lock();
     randomPiece(first);
+    removeTimer(moveDown);
 
     rotposn = 0;
+    topleftx = 3;
+    toplefty = -1;
     if (!first) {
         // LOOKS SO MUCH BETTER NOW
         for (y = 0; y < 3; y += 1) {
             for (x = 3; x < 7; x += 1) {
-                array[y][x] = piece * rotArray[4 * (piece - 8)][y + 1][x - 3];
+                if (rotArray[4 * (piece - 8)][y + 1][x - 3]) {
+                    if (array[y][x]) {
+                        alert("game over\nlevel: " + currLevel);
+                        looping = false;
+                    }
+                    array[y][x] = piece * rotArray[4 * (piece - 8)][y + 1][x - 3];
+                }
             }
         }
+
+        // only increase the level if it's not the firs level
+        currLevel += 1;
     }
-    topleftx = 3;
-    toplefty = -1;
 };
 
 // determines whether the current piece is at the bottom, and if it is, generates a new piece
@@ -599,7 +631,7 @@ var doesLock = function () {
 // a function to print out whatever is wanted.  called by pressing q
 var debugPrint = function () {
     "use strict";
-    removeTimer(newPiece);
+    alert(toplefty);
 };
 
 /////////////

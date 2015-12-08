@@ -3,7 +3,8 @@
 # piece outlining
 # lock animation
 # grades
-# score
 # levels
 # pause on loss of focus
 # fix "pause, switch window, unpause" not working bug
+# add combo and bravo to score calculation
+# make DAS correct

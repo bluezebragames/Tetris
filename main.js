@@ -1,5 +1,5 @@
 // declare variables up here because jslint doesn't like me
-var loop, counter = 0, canvas, context, now, array, i, x, y, piece, nextpiece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11], timers = [], numTimers = -1, looping = true, downOne, currLevel = 0;
+var loop, counter = 0, canvas, context, now, array, i, x, y, piece, nextpiece, topleftx, toplefty, rotposn, rotArray, keys = [], pieces = [11, 11, 11, 11], timers = [], numTimers = -1, looping = true, downOne, currLevel = 0, score = 0, soft = 0;
 
 // start everything up!
 var main = function () {
@@ -222,6 +222,12 @@ var drawBlocks = function () {
     }
 };
 
+var drawPanel = function () {
+    "use strict";
+    document.getElementById("score").innerHTML = Math.floor(score);
+    document.getElementById("level").innerHTML = currLevel;
+};
+
 // draws the next piece in the next box
 // DON'T LOOK AT THIS CODE UNLESS YOU WANT TO THROW UP
 var drawNext = function () {
@@ -242,6 +248,7 @@ var draw = function () {
     drawBackground();
     drawNext();
     drawBlocks();
+    drawPanel();
 };
 
 
@@ -256,6 +263,7 @@ var moveDown = function () {
     if (doesLock()) {
         return;
     }
+    soft += 1;
     for (y = 19; y >= 0; y -= 1) {
         for (x = 0; x < 10; x += 1) {
             if (array[y][x] > 7) {
@@ -321,12 +329,26 @@ var moveRight = function () {
 // jk it hard drops the piece
 var moveDrop = function () {
     "use strict";
+    counter = 0;
     while (!doesLock()) {
         moveDown();
+        counter++;
     }
+    soft += 2 * counter;
+
     // hard drop resets the gravity timer
     removeTimer(moveDown);
 };
+
+///////
+//SCORE
+///////
+
+// Score = ((Level + Lines)/4 + Soft) x Lines x ((2 x Lines) - 1) x Combo x Bravo
+var calculateScore = function (lines) {
+    score += ((currLevel + lines)/4 + soft) * lines * ((2 * lines) - 1);
+}
+
 
 /////////
 //GRAVITY
@@ -418,6 +440,9 @@ var canRotateHelper = function (leftAdjust) {
         for (y = toplefty; y < toplefty + 4; y += 1) {
             // those pluses and minuses though
             if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty][x - topleftx - leftAdjust]) {
+                if (y >= 20) {
+                    return false;
+                }
                 if (array[y][x] !== 0 && array[y][x] < 8) {
                     if (moved) {
                         toplefty -= 1;
@@ -475,7 +500,7 @@ var rotate = function (dir) {
     // clear out old piece
     for (x = topleftx; x < topleftx + 4; x += 1) {
         for (y = toplefty; y < toplefty + 4; y += 1) {
-            if (y >= 0 && array[y][x] > 7) {
+            if (y >= 0 && y < 20 && array[y][x] > 7) {
                 array[y][x] = 0;
             }
         }
@@ -484,7 +509,7 @@ var rotate = function (dir) {
     // add new piece
     for (x = topleftx + ret; x < topleftx + 4 + ret; x += 1) {
         for (y = toplefty + downOne; y < toplefty + 4 + downOne; y += 1) {
-            if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty - downOne][x - topleftx - ret]) {
+            if (rotArray[rotposn + 4 * (piece - 8)][y - toplefty - downOne][x - topleftx - ret] && y < 20) {
                 array[y][x] = piece;
             }
         }
@@ -527,8 +552,7 @@ var clearLines = function () {
             }
         }
     }
-
-    currLevel += numlines;
+    return numlines;
 };
 
 
@@ -546,6 +570,9 @@ var lock = function () {
             }
         }
     }
+    var numlines = clearLines();
+    calculateScore(numlines);
+    currLevel += numlines;
 };
 
 var checkLocks = function () {
@@ -592,6 +619,7 @@ var newPiece = function (first) {
     rotposn = 0;
     topleftx = 3;
     toplefty = -1;
+    soft = 0;
     if (!first) {
         // LOOKS SO MUCH BETTER NOW
         for (y = 0; y < 3; y += 1) {
@@ -606,7 +634,7 @@ var newPiece = function (first) {
             }
         }
 
-        // only increase the level if it's not the firs level
+        // only increase the level if it's not the first level
         currLevel += 1;
     }
 };
@@ -685,7 +713,6 @@ var loop = function () {
     timerFrame();
     checkLocks();
     doGravity();
-    clearLines();
     handleKeys();
 
 
@@ -701,6 +728,21 @@ var loop = function () {
 function getChar(event) {
     "use strict";
     keys[event.keyCode] = event.type === 'keydown';
+    // CAPS LOCK key is specially here because it pauses the game
+    // so it can't be in handleKeys because loop calls it
+    if (!looping && !keys[20]) {
+        looping = true;
+        loop();
+    }
+}
+
+window.onblur = function (e) {
+    "use strict";
+    looping = false;
+}
+
+window.onfocus = function (e) {
+    "use strict";
     // CAPS LOCK key is specially here because it pauses the game
     // so it can't be in handleKeys because loop calls it
     if (!looping && !keys[20]) {
